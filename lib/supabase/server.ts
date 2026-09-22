@@ -13,9 +13,16 @@ export async function createClient() {
 
 export async function requireAdmin() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError) throw userError
   if (!user) throw new Error('UNAUTHORIZED')
-  const { data: admin } = await supabase.from('admins').select('role,active').eq('user_id', user.id).single()
-  if (!admin?.active) throw new Error('FORBIDDEN')
-  return { supabase, user, admin }
+
+  // `admins` is protected by RLS. Use the SECURITY DEFINER helper instead of
+  // reading the table directly so an authenticated administrator can be
+  // authorized even when no SELECT policy exists on that table.
+  const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin')
+  if (adminError) throw adminError
+  if (!isAdmin) throw new Error('FORBIDDEN')
+
+  return { supabase, user }
 }
