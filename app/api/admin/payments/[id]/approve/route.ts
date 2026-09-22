@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server';import {requireAdmin} from '@/lib/supabase/server'
+export async function POST(req:Request,{params}:{params:Promise<{id:string}>}){try{const{id}=await params;const{ supabase}=await requireAdmin();const{error}=await supabase.rpc('approve_payment',{p_payment:id});if(error)throw error;return NextResponse.redirect(new URL('/admin/pagos',req.url),303)}catch{return NextResponse.json({error:'No se pudo aprobar.'},{status:400})}}

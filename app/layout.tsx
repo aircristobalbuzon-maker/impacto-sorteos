@@ -1,0 +1,3 @@
+import './globals.css';import Link from 'next/link'
+export const metadata={title:'Sorteos IMPACTO',description:'Plataforma oficial de sorteos IMPACTO'}
+export default function Layout({children}:{children:React.ReactNode}){return <html lang="es"><body><header><Link className="logo" href="/"><span>IMPACTO</span><small>PROTEGE LO QUE MÁS AMAS</small></Link><nav><Link href="/">Sorteo</Link><Link href="/mis-tickets">Mis tickets</Link><Link href="/resultados">Resultados</Link><a href="https://www.impactoperu.net">Web IMPACTO</a></nav></header>{children}<footer><div className="logo"><span>IMPACTO</span><small>PLATAFORMA OFICIAL DE SORTEOS</small></div><p>Participación responsable · Bases y condiciones aplicables.</p></footer></body></html>}

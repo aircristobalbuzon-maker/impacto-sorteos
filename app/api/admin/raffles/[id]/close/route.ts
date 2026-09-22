@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server';import {requireAdmin} from '@/lib/supabase/server'
+export async function POST(req:Request,{params}:{params:Promise<{id:string}>}){const{id}=await params;const{supabase,user}=await requireAdmin();await supabase.from('raffles').update({status:'SALES_CLOSED',updated_at:new Date().toISOString()}).eq('id',id).eq('status','ACTIVE');await supabase.from('audit_logs').insert({admin_id:user.id,action:'SALES_CLOSED',entity_type:'raffle',entity_id:id});return NextResponse.redirect(new URL(`/admin/sorteos/${id}`,req.url),303)}
