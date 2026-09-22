@@ -1,2 +1,3 @@
 import Link from 'next/link';import {adminClient} from '@/lib/supabase/admin'
+export const dynamic = 'force-dynamic'
 export default async function Page(){const db=adminClient();const{data:rows}=await db.from('raffles').select('id,slug,name,draws_at').eq('status','FINISHED').order('draws_at',{ascending:false});return <main className="page"><span className="eyebrow">TRANSPARENCIA</span><h1>RESULTADOS</h1>{rows?.map(r=><Link key={r.id} className="card" style={{display:'block',marginBottom:12}} href={`/resultados/${r.slug}`}><b>{r.name}</b><p className="muted">Finalizado · {new Date(r.draws_at).toLocaleDateString('es-PE')}</p></Link>)}</main>}
