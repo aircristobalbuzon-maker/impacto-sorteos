@@ -11,9 +11,10 @@ export async function GET(request: Request) {
   const db = adminClient()
   const document = normalizeDocument(rawQuery)
   const whatsapp = normalizeWhatsapp(rawQuery)
+  const legacyWhatsapp = rawQuery.replace(/\D/g, '')
   const [{ data: documentMatches, error: documentError }, { data: phoneMatches, error: phoneError }] = await Promise.all([
     db.from('participants').select('id').eq('document', document),
-    db.from('participants').select('id').eq('whatsapp', whatsapp),
+    db.from('participants').select('id').in('whatsapp', [...new Set([whatsapp, legacyWhatsapp])]),
   ])
 
   if (documentError || phoneError) {
