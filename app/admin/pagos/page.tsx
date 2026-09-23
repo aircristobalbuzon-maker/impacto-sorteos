@@ -3,7 +3,8 @@ import { adminClient } from '@/lib/supabase/admin'
 import { money } from '@/lib/format'
 import { paymentStatusLabel } from '@/lib/status-labels'
 
-export default async function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ whatsapp?: string }> }) {
+  const { whatsapp } = await searchParams
   const { supabase: db } = await requireAdmin()
   const { data: rows } = await db.from('payments').select('id,status,created_at,proof_path,purchases(quantity,total_cents,participants(full_name,document,whatsapp),raffles(name))').order('created_at', { ascending: false })
   const storage = adminClient().storage.from('payment-proofs')
@@ -17,6 +18,9 @@ export default async function Page() {
     <span className="eyebrow">VALIDACIÓN MANUAL</span>
     <h1>Pagos</h1>
     <p className="muted">Revisa el comprobante antes de aprobar. Al aprobar, el sistema asigna automáticamente los tickets.</p>
+    {whatsapp === 'sent' && <p className="success">Pago aprobado, tickets creados y notificación enviada por WhatsApp.</p>}
+    {whatsapp === 'failed' && <p className="notice"><b>Pago aprobado y tickets creados.</b><br/>WhatsApp rechazó el mensaje. Revisa la configuración o envía los tickets manualmente.</p>}
+    {whatsapp === 'unconfigured' && <p className="notice"><b>Pago aprobado y tickets creados.</b><br/>Falta conectar las credenciales de WhatsApp Business para enviar la notificación automática.</p>}
     <div className="card table-wrap"><table>
       <thead><tr><th>Participante</th><th>Sorteo</th><th>Tickets</th><th>Importe</th><th>Comprobante</th><th>Estado</th><th>Acciones</th></tr></thead>
       <tbody>{rows?.map((payment: any) => <tr key={payment.id}>
