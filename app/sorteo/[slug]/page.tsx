@@ -9,19 +9,33 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const { data: raffle } = await db.from('raffles').select('*').eq('slug', slug).single()
   if (!raffle) notFound()
   const open = raffle.status === 'ACTIVE'
-  return <main className="page">
-    <span className="eyebrow">SORTEO OFICIAL IMPACTO</span><h1>{raffle.name}</h1>
-    <div className="grid">
-      <section className="card col8">
-        {raffle.banner_url && <img src={raffle.banner_url} alt={`Portada de ${raffle.name}`} className="raffle-banner"/>}
-        <p className="lead">{raffle.description}</p><h2>{money(raffle.price_cents)} por ticket</h2>
-        <p><b>Fecha del sorteo:</b> {new Date(raffle.draws_at).toLocaleString('es-PE')}</p>
-        <div className="notice"><b>Validación manual</b><p>Después de enviar el comprobante, revisaremos el pago. Puede tomar algunos minutos o hasta el siguiente día hábil fuera del horario de atención.</p></div>
-      </section>
-      <aside className="card col4"><span className="eyebrow">PASO 1</span><h2>{open ? 'Elige tus tickets' : 'Ventas cerradas'}</h2>{open ? <PurchaseForm slug={slug} price={raffle.price_cents}/> : <p>Este sorteo ya no acepta nuevas compras.</p>}</aside>
-      <section className="card col8"><span className="eyebrow">PASO 2</span><h2>Paga por Yape</h2><div className="yape-data"><strong>{raffle.yape_number}</strong><span>{raffle.yape_recipient}</span></div><p className="muted">Haz el pago por el total indicado y guarda una captura del comprobante para adjuntarla en el formulario.</p></section>
-      <section className="card col4"><span className="eyebrow">PASO 3</span><h2>Consulta tus tickets</h2><p>Después de la validación podrás encontrarlos con tu documento o WhatsApp.</p><a className="outline" href="/mis-tickets">CONSULTAR TICKETS</a></section>
-      <section className="card col12"><h3>Bases y condiciones</h3><p className="muted terms">{raffle.terms}</p></section>
-    </div>
+
+  return <main className="page raffle-page">
+    <header className="raffle-heading">
+      <div className="raffle-brand"><strong>IMPACTO</strong><span>PLATAFORMA OFICIAL DE SORTEOS</span></div>
+      <span className="active-pill">{open ? '● SORTEO ACTIVO' : 'VENTAS CERRADAS'}</span>
+      <h1>{raffle.name}</h1>
+      <p>{raffle.description}</p>
+      <div className="raffle-facts">
+        <div><small>PRECIO POR TICKET</small><strong>{money(raffle.price_cents)}</strong></div>
+        <div><small>FECHA DEL SORTEO</small><strong>{new Date(raffle.draws_at).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })}</strong></div>
+      </div>
+    </header>
+
+    {raffle.banner_url && <img src={raffle.banner_url} alt={`Portada de ${raffle.name}`} className="raffle-banner" />}
+
+    {open ? <PurchaseForm
+      slug={slug}
+      raffleName={raffle.name}
+      price={raffle.price_cents}
+      yapeNumber={raffle.yape_number}
+      yapeRecipient={raffle.yape_recipient}
+    /> : <section className="card closed-card"><h2>Este sorteo ya no recibe participaciones</h2><p>Puedes consultar tus tickets o revisar los resultados desde el menú.</p></section>}
+
+    <section className="validation-note">
+      <b>VALIDACIÓN MANUAL Y SEGURA</b>
+      <p>Revisamos cada comprobante antes de activar los tickets. Puede tomar algunos minutos o hasta el siguiente día hábil fuera del horario de atención.</p>
+    </section>
+    <section className="terms-card"><h3>Bases y condiciones</h3><p>{raffle.terms}</p></section>
   </main>
 }
