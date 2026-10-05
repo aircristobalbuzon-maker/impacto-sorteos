@@ -23,6 +23,7 @@ export default async function Page({ searchParams }: Props) {
         <label>Contraseña</label>
         <input name="password" type="password" autoComplete="current-password" required />
         <button>INICIAR SESIÓN</button>
+        <a className="forgot-link" href="/recuperar-acceso">¿Olvidaste tu contraseña? Recuperar acceso</a>
       </form>
     </main>
   )
