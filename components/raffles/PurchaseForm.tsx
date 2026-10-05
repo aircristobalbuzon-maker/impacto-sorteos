@@ -10,9 +10,10 @@ type Props = {
   price: number
   yapeNumber: string
   yapeRecipient: string
+  yapeQrUrl?: string | null
 }
 
-export default function PurchaseForm({ slug, raffleName, price, yapeNumber, yapeRecipient }: Props) {
+export default function PurchaseForm({ slug, raffleName, price, yapeNumber, yapeRecipient, yapeQrUrl }: Props) {
   const [quantity, setQuantity] = useState(1)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
@@ -44,8 +45,8 @@ export default function PurchaseForm({ slug, raffleName, price, yapeNumber, yape
       <span className="success-icon">✓</span>
       <h2>¡Comprobante recibido!</h2>
       <p>{message}</p>
-      <p>IMPACTO revisará el pago. Cuando sea aprobado, tus tickets aparecerán en la consulta y recibirás la confirmación por WhatsApp.</p>
-      <Link className="outline" href="/mis-tickets">CONSULTAR MIS TICKETS</Link>
+      <p>IMPACTO revisará tu pago. Una vez validado, podrás consultar tus números de tickets con tu DNI o celular.</p>
+      <Link className="primary success-lookup" href="/mis-tickets">CONSULTAR MIS TICKETS</Link>
     </section>
   }
 
@@ -62,7 +63,7 @@ export default function PurchaseForm({ slug, raffleName, price, yapeNumber, yape
     </div>
 
     <div className="form-step">
-      <div className="step-title"><b>2</b><div><span>TICKETS</span><h2>Elige tu cantidad</h2></div></div>
+      <div className="step-title"><b>2</b><div><span>PARTICIPACIÓN</span><h2>Elige tu cantidad</h2></div></div>
       <div className="ticket-options" role="group" aria-label="Cantidad de tickets">
         {[1, 3, 5, 10].map(number => <button type="button" key={number} className={quantity === number ? 'selected' : 'outline'} onClick={() => setQuantity(number)} aria-pressed={quantity === number}>{number}<small>{number === 1 ? 'ticket' : 'tickets'}</small></button>)}
       </div>
@@ -77,13 +78,14 @@ export default function PurchaseForm({ slug, raffleName, price, yapeNumber, yape
       <div className="yape-box">
         <span>YAPEAR A NOMBRE DE</span>
         <strong>{yapeRecipient}</strong>
+        {yapeQrUrl && <img className="yape-qr" src={yapeQrUrl} alt="Código QR de Yape de IMPACTO" />}
         <a href={`tel:${yapeNumber}`} aria-label={`Número de Yape ${yapeNumber}`}>{yapeNumber}</a>
         <div><small>MONTO EXACTO</small><b>{money(quantity * price)}</b></div>
       </div>
     </div>
 
     <div className="form-step proof-step">
-      <div className="step-title"><b>4</b><div><span>COMPROBANTE</span><h2>Sube la captura del Yape</h2></div></div>
+      <div className="step-title"><b>4</b><div><span>CONFIRMACIÓN</span><h2>Sube tu comprobante</h2></div></div>
       <p className="step-help">Este paso es obligatorio. Selecciona la captura donde se vea que el pago fue realizado.</p>
       <label className={`upload-box ${proofName ? 'has-file' : ''}`} htmlFor="proof">
         <span className="upload-icon">{proofName ? '✓' : '↑'}</span>
