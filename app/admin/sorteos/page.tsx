@@ -22,17 +22,27 @@ async function createRaffle(form: FormData) {
     terms: String(form.get('terms')),
     status: 'DRAFT',
   })
-  if (error) throw error
-  redirect('/admin/sorteos')
+  if (error) {
+    if (error.code === '23505') {
+      redirect('/admin/sorteos?error=slug-duplicado')
+    }
+    console.error('[raffles/create] failed', { code: error.code, message: error.message })
+    redirect('/admin/sorteos?error=crear')
+  }
+  redirect('/admin/sorteos?created=1')
 }
 
-export default async function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ error?: string; created?: string }> }) {
+  const query = await searchParams
   const { supabase: db } = await requireAdmin()
   const { data: rows } = await db.from('raffles').select('*').order('created_at', { ascending: false })
   return <>
     <span className="eyebrow">CONFIGURACIÓN</span>
     <h1>Sorteos</h1>
     <p className="muted">Crea el sorteo, revisa sus datos y luego pulsa <b>ACTIVAR Y PUBLICAR</b> desde “Gestionar”.</p>
+    {query.error === 'slug-duplicado' && <div className="card" style={{marginBottom: 18}}><b>Ese enlace corto ya está siendo usado.</b><p className="muted">Usa otro, por ejemplo: experiencia-impacto-2.</p></div>}
+    {query.error === 'crear' && <div className="card" style={{marginBottom: 18}}><b>No se pudo crear el sorteo.</b><p className="muted">Revisa los datos e inténtalo nuevamente.</p></div>}
+    {query.created === '1' && <div className="card" style={{marginBottom: 18}}><b>Sorteo creado correctamente.</b></div>}
     <div className="grid">
       <section className="card col8 table-wrap">
         <table>
