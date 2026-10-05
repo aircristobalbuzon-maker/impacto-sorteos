@@ -38,3 +38,4 @@ export default function Page() {
       <a className="forgot-link" href="/acceso-admin">Volver al inicio de sesión</a>
     </section>
   </main>
+}
