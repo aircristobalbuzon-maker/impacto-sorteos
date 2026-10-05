@@ -30,6 +30,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       price={raffle.price_cents}
       yapeNumber={raffle.yape_number}
       yapeRecipient={raffle.yape_recipient}
+      yapeQrUrl={raffle.yape_qr_url}
     /> : <section className="card closed-card"><h2>Este sorteo ya no recibe participaciones</h2><p>Puedes consultar tus tickets o revisar los resultados desde el menú.</p></section>}
 
     <section className="validation-note">
