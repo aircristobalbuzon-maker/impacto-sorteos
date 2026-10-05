@@ -1,13 +1,8 @@
 'use client'
 
-import { FormEvent, useMemo, useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+import { FormEvent, useState } from 'react'
 
 export default function Page() {
-  const supabase = useMemo(() => createClient(supabaseUrl, supabaseAnonKey), [])
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
@@ -16,12 +11,21 @@ export default function Page() {
     event.preventDefault()
     setBusy(true)
     setMessage('')
-    const redirectTo = `${window.location.origin}/auth/setup-password`
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), { redirectTo })
-    setBusy(false)
-    setMessage(error
-      ? 'No pudimos enviar el enlace. Revisa el correo e inténtalo nuevamente.'
-      : 'Te enviamos un enlace para crear una nueva contraseña. Revisa también tu carpeta de spam.')
+    try {
+      const response = await fetch('/api/auth/recover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const result = await response.json()
+      setMessage(response.ok
+        ? 'Te enviamos un enlace para crear una nueva contraseña. Revisa también tu carpeta de spam.'
+        : (result.error || 'No pudimos enviar el enlace. Inténtalo nuevamente.'))
+    } catch {
+      setMessage('No pudimos enviar el enlace. Inténtalo nuevamente.')
+    } finally {
+      setBusy(false)
+    }
   }
 
   return <main className="page">
