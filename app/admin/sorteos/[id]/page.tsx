@@ -52,7 +52,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <Link className="outline" href="/admin/pagos">IR A PAGOS</Link>
       </section>
 
-      {editable && <form className="card col8" action={`/api/admin/raffles/${id}/update`} method="post">
+      {editable && <form className="card col8" action={`/api/admin/raffles/${id}/update`} method="post" encType="multipart/form-data">
         <h2>Editar información</h2>
         <label>Nombre</label><input name="name" defaultValue={raffle.name} required/>
         <label>Descripción</label><textarea name="description" defaultValue={raffle.description} required/>
@@ -65,6 +65,12 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         </div>
         <label>Número de Yape</label><input name="yapeNumber" defaultValue={raffle.yape_number} required/>
         <label>Titular de Yape</label><input name="yapeRecipient" defaultValue={raffle.yape_recipient} required/>
+        <label>QR de Yape</label><input name="yapeQr" type="file" accept="image/jpeg,image/png,image/webp"/>
+        {raffle.yape_qr_url && <img src={raffle.yape_qr_url} alt="QR de Yape actual" className="admin-image-preview"/>}
+        <small className="muted">Sube una imagen nueva solo si deseas reemplazar el QR actual.</small>
+        <label>Imagen principal del sorteo</label><input name="banner" type="file" accept="image/jpeg,image/png,image/webp"/>
+        {raffle.banner_url && <img src={raffle.banner_url} alt="Imagen actual del sorteo" className="admin-image-preview banner-preview"/>}
+        <small className="muted">Esta imagen aparecerá en el apartado del sorteo vigente.</small>
         <label>Bases y condiciones</label><textarea name="terms" defaultValue={raffle.terms} required/>
         <button>GUARDAR CAMBIOS</button>
       </form>}
